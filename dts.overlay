@@ -1,0 +1,75 @@
+/ {
+	chosen {
+		zephyr,console = &usart2;
+		zephyr,shell-uart = &usart2;
+		zephyr,code-partition=&main_partition;
+		zephyr,storage-partition=&scratch_partition;
+	};
+};
+
+&usart1 {
+	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
+	current-speed = <115200>;
+	/delete-property/ hw-flow-control;
+	status = "okay";
+};
+
+&usart2 {
+	pinctrl-0 = <&usart2_tx_pa2 &usart2_rx_pa3>;
+	current-speed = <115200>;
+	/delete-property/ hw-flow-control;
+	status = "okay";
+};
+
+&usart6{
+	pinctrl-0 = <&usart6_tx_pa11 &usart6_rx_pa12>;
+	current-speed = <9600>;
+	/delete-property/ hw-flow-control;
+	status = "okay";
+};
+
+&flash0 {
+	/delete-property/ partitions;
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		main_partition: partition@0 {
+			label = "mainpart";
+			reg = <0x00000000 0x00080000>;
+			read-only;
+		};
+	};
+};
+
+&spi1 {
+	pinctrl-0 = <&spi1_miso_pa6 &spi1_mosi_pa7 &spi1_sck_pa5>;
+	status = "okay";
+	cs-gpios = <&gpioa 4 GPIO_ACTIVE_LOW>;
+
+	norflash: norflash@0 {
+		status = "okay";
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		label = "norflash";
+		spi-max-frequency = <2000000>;
+		size = <33554432>;
+		jedec-id = [BF 25 4A];
+		has-lock = <0xFF>;
+	};
+};
+
+
+&norflash {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		storage_partition: partition@0 {
+			label = "storage";
+			reg = <0x0 0x3D0900>;
+		};
+	};
+};
+
